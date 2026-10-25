@@ -36,7 +36,7 @@ class _ServiciosViewState extends State<ServiciosView> {
           ),
           body: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // chips categoría
                 Padding(
@@ -95,13 +95,13 @@ class _ServiciosViewState extends State<ServiciosView> {
       },
     );
   }
+}
 
-  int _columnas(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    if (w < 600) return 2;
-    if (w < 840) return 3;
-    return 4;
-  }
+int _columnas(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+  if (w < 600) return 2;
+  if (w < 840) return 3;
+  return 4;
 }
 
 class _GridServicios extends StatelessWidget {
@@ -111,14 +111,14 @@ class _GridServicios extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cols = (context as _ServiciosViewState)._columnas(context);
+    final cols = _columnas(context);
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: cols,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 0.9,
+        mainAxisExtent: 190,
       ),
       itemCount: lista.length,
       itemBuilder: (context, i) {
@@ -141,6 +141,8 @@ class _ChipCat extends StatelessWidget {
       label: Text(label),
       selected: seleccionado,
       onSelected: (_) => onTap(),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
       labelStyle: TextStyle(
         fontSize: 13, fontWeight: FontWeight.w500,
         color: seleccionado
@@ -188,7 +190,7 @@ class _TarjetaServicio extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              height: 84,
+              height: 76,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(12),
@@ -197,21 +199,27 @@ class _TarjetaServicio extends StatelessWidget {
                   size: 36, color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 10),
-            Text(servicio.nombre, style: TextStyle(
-              fontSize: 14, fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-            )),
+            Text(servicio.nombre,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                )),
             const SizedBox(height: 6),
             Row(
               children: [
                 Icon(Icons.access_time, size: 12,
                     color: Theme.of(context).colorScheme.onSurfaceVariant),
                 const SizedBox(width: 3),
-                Text('${servicio.duracionMinutos} min',
-                    style: TextStyle(
-                      fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    )),
-                const Spacer(),
+                Expanded(
+                  child: Text('${servicio.duracionMinutos} min',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      )),
+                ),
                 Text('\$${servicio.precio.toInt()}', style: TextStyle(
                   fontSize: 13, fontWeight: FontWeight.w700,
                   color: Theme.of(context).colorScheme.primary,
@@ -242,26 +250,49 @@ class _EstadoVacio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 200, height: 200,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final lado = constraints.maxHeight.isFinite
+            ? (constraints.maxHeight * 0.5).clamp(96.0, 200.0)
+            : 200.0;
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  constraints.maxHeight.isFinite ? constraints.maxHeight : 0,
             ),
-            child: Icon(Icons.content_cut, size: 56,
-                color: Theme.of(context).colorScheme.primary),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: lado, height: lado,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.content_cut, size: 56,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('No hay servicios',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text('Cambia los filtros para ver más opciones.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 16),
-          const Text('No hay servicios',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          Text('Cambia los filtros para ver más opciones.',
-              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
-        ],
-      ),
+        );
+      },
     );
   }
 }

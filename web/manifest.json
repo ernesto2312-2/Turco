@@ -1,10 +1,10 @@
-{
-    "name": "untitled",
-    "short_name": "untitled",
+﻿{
+    "name": "Turco",
+    "short_name": "Turco",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "background_color": "#F4FBF9",
+    "theme_color": "#006A60",
     "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
@@ -33,3 +33,4 @@
         }
     ]
 }
+

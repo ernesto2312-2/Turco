@@ -819,25 +819,38 @@ class _BarraInferior extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _ItemResumen(
-                  icono: Icons.access_time,
-                  texto: '${vm.duracionMinutos} min',
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: _ItemResumen(
+                      icono: Icons.access_time,
+                      texto: '${vm.duracionMinutos} min',
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
-                const Spacer(),
-                _ItemResumen(
-                  icono: Icons.flag,
-                  texto: ini == null
-                      ? 'Fin --:--'
-                      : 'Fin ${ini.hour.toString().padLeft(2,'0')}:${ini.minute.toString().padLeft(2,'0')}',
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: _ItemResumen(
+                      icono: Icons.flag,
+                      texto: ini == null
+                          ? 'Fin --:--'
+                          : 'Fin ${ini.hour.toString().padLeft(2,'0')}:${ini.minute.toString().padLeft(2,'0')}',
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
-                const Spacer(),
-                _ItemResumen(
-                  icono: Icons.attach_money,
-                  texto: '\$${vm.precioTotal.toInt()}',
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  peso: FontWeight.w700,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _ItemResumen(
+                      icono: Icons.attach_money,
+                      texto: '\$${vm.precioTotal.toInt()}',
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      peso: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -876,13 +889,16 @@ class _BarraInferior extends StatelessWidget {
                         borderRadius: BorderRadius.circular(23),
                       ),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check, size: 18),
-                        SizedBox(width: 8),
-                        Text('Guardar turno'),
-                      ],
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check, size: 18),
+                          const SizedBox(width: 8),
+                          const Text('Guardar turno'),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -911,10 +927,15 @@ class _ItemResumen extends StatelessWidget {
       children: [
         Icon(icono, size: 14, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 6),
-        Text(texto, style: TextStyle(
-          fontSize: 13, fontWeight: peso ?? FontWeight.w600,
-          color: color,
-        )),
+        Flexible(
+          child: Text(texto,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+            fontSize: 13, fontWeight: peso ?? FontWeight.w600,
+            color: color,
+          )),
+        ),
       ],
     );
   }

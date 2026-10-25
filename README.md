@@ -132,6 +132,17 @@ flutter pub get
 flutter run
 ```
 
+## Pruebas
+
+```bash
+flutter analyze
+flutter test
+```
+
+`test/layout_test.dart` comprueba que las 6 pantallas (más el formulario en
+modo edición) no desborden en tamaños de teléfono (360×640 y 320×568) y en
+tema claro y oscuro.
+
 ## Dependencias externas
 
 - [`go_router`](https://pub.dev/packages/go_router) para la navegación.

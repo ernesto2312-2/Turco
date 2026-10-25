@@ -53,7 +53,7 @@ class _AgendaViewState extends State<AgendaView> {
           ),
           body: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _BarraFecha(agenda: _agenda),
 
@@ -99,26 +99,28 @@ class _AgendaViewState extends State<AgendaView> {
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _ChipEstilista(
-                        label: 'Todos',
-                        seleccionado: _agenda.estilistaFiltroId == null,
-                        onTap: () => _agenda.cambiarFiltroEstilista(null),
-                      ),
-                      for (final e in _agenda.estilistas)
-                        _ChipEstilista(
-                          label: e.nombre,
-                          seleccionado:
-                              _agenda.estilistaFiltroId == e.id,
-                          onTap: () =>
-                              _agenda.cambiarFiltroEstilista(e.id),
-                        ),
-                    ],
+                SizedBox(
+                  height: 36,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _agenda.estilistas.length + 1,
+                    separatorBuilder: (context, i) => const SizedBox(width: 8),
+                    itemBuilder: (context, i) {
+                      if (i == 0) {
+                        return _ChipEstilista(
+                          label: 'Todos',
+                          seleccionado: _agenda.estilistaFiltroId == null,
+                          onTap: () => _agenda.cambiarFiltroEstilista(null),
+                        );
+                      }
+                      final e = _agenda.estilistas[i - 1];
+                      return _ChipEstilista(
+                        label: e.nombre,
+                        seleccionado: _agenda.estilistaFiltroId == e.id,
+                        onTap: () => _agenda.cambiarFiltroEstilista(e.id),
+                      );
+                    },
                   ),
                 ),
 
@@ -341,7 +343,6 @@ class _BarraFecha extends StatelessWidget {
             icon: const Icon(Icons.chevron_right, size: 28),
             onPressed: agenda.diaSiguiente,
           ),
-          const Spacer(),
           IconButton(
             icon: const Icon(Icons.calendar_today, size: 22),
             onPressed: () => _elegirFecha(context),
@@ -437,6 +438,8 @@ class _ChipEstilista extends StatelessWidget {
       label: Text(label),
       selected: seleccionado,
       onSelected: (_) => onTap(),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
       labelStyle: TextStyle(
         fontSize: 13, fontWeight: FontWeight.w500,
         color: seleccionado
@@ -457,29 +460,51 @@ class _EstadoVacio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 240, height: 240,
-            decoration: BoxDecoration(
-              color: cs.primary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // El círculo se adapta a la altura disponible para no desbordar en
+        // pantallas pequeñas; si aun así no cabe, la vista completa se desplaza.
+        final lado = constraints.maxHeight.isFinite
+            ? (constraints.maxHeight * 0.5).clamp(96.0, 240.0)
+            : 240.0;
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight.isFinite
+                  ? constraints.maxHeight
+                  : 0,
             ),
-            child: Icon(Icons.event_busy, size: 56, color: cs.primary),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: lado, height: lado,
+                      decoration: BoxDecoration(
+                        color: cs.primary.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.event_busy, size: 56, color: cs.primary),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('No hay turnos para este día',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Crea el primer turno con el botón de abajo o cambia los filtros.',
+                      style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          const Text('No hay turnos para este día',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(
-            'Crea el primer turno con el botón de abajo o cambia los filtros.',
-            style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -578,6 +603,8 @@ class _TarjetaTurno extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       servicios.map((s) => s.nombre).join(' + '),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12, fontWeight: FontWeight.normal,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -589,11 +616,16 @@ class _TarjetaTurno extends StatelessWidget {
                         Icon(Icons.person, size: 13,
                             color: Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
-                        Text(estilista, style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        )),
-                        const Spacer(),
+                        Expanded(
+                          child: Text(estilista,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          )),
+                        ),
+                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),

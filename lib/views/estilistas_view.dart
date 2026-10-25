@@ -29,7 +29,8 @@ class _EstilistasViewState extends State<EstilistasView> {
               pinned: true,
               expandedHeight: 170,
               flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.fromLTRB(20, 85, 20, 8),
+                expandedTitleScale: 1,
+                titlePadding: const EdgeInsets.fromLTRB(20, 56, 20, 8),
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -45,6 +46,8 @@ class _EstilistasViewState extends State<EstilistasView> {
                     const SizedBox(height: 6),
                     Text(
                       '${estilistas.length} profesionales · ${estilistas.fold(0, (s, e) => s + e.turnosHoy)} turnos programados hoy',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13, color: context.turco.appBarSubtitle,
                       ),

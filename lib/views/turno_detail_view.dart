@@ -162,8 +162,6 @@ class _TarjetaHorario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = vm.turno!;
-    final ini = t.fechaHoraInicio;
-    final fin = t.fechaHoraFin;
     return Card(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -195,21 +193,31 @@ class _TarjetaHorario extends StatelessWidget {
                           Icon(Icons.phone, size: 13,
                               color: Theme.of(context).colorScheme.onSurfaceVariant),
                           const SizedBox(width: 4),
-                          Text(vm.telefonoCliente, style: TextStyle(
-                            fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          )),
+                          Flexible(
+                            child: Text(vm.telefonoCliente,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                              fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            )),
+                          ),
                         ],
                       ),
-                      if (t.notas != null && t.notas!.isNotEmpty) ...[
+                      if (vm.correoCliente != null) ...[
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Icon(Icons.mail, size: 13,
                                 color: Theme.of(context).colorScheme.onSurfaceVariant),
                             const SizedBox(width: 4),
-                            Text('carlos.ruiz@correo.com', style: TextStyle(
-                              fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            )),
+                            Flexible(
+                              child: Text(vm.correoCliente!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              )),
+                            ),
                           ],
                         ),
                       ],
@@ -231,14 +239,10 @@ class _TarjetaHorario extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _DatoFecha(cs: cs, icono: Icons.calendar_today,
-                label: 'Fecha',
-                valor: '${ini.day}/${ini.month}/${ini.year} ${_nombreMes(ini.month)} ${ini.year}'),
+                label: 'Fecha', valor: vm.fechaTexto),
             const SizedBox(height: 8),
             _DatoFecha(cs: cs, icono: Icons.access_time,
-                label: 'Hora',
-                valor: '${ini.hour.toString().padLeft(2,'0')}:${ini.minute.toString().padLeft(2,'0')} a '
-                    '${fin.hour.toString().padLeft(2,'0')}:${fin.minute.toString().padLeft(2,'0')} '
-                    '(${t.duracionMinutos(vm.servicios)} min)'),
+                label: 'Hora', valor: vm.horaTexto),
             const SizedBox(height: 8),
             _DatoFecha(cs: cs, icono: Icons.person,
                 label: 'Estilista',
@@ -248,11 +252,6 @@ class _TarjetaHorario extends StatelessWidget {
       ),
     );
   }
-
-  String _nombreMes(int m) => const [
-    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
-  ][m - 1];
 
   Color _fondoEstado(BuildContext context, EstadoTurno e) => switch (e) {
     EstadoTurno.programado => Theme.of(context).colorScheme.primaryContainer,
@@ -283,19 +282,21 @@ class _DatoFecha extends StatelessWidget {
       children: [
         Icon(icono, size: 18, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.normal,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            )),
-            const SizedBox(height: 2),
-            Text(valor, style: TextStyle(
-              fontSize: 14, fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            )),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(
+                fontSize: 11, fontWeight: FontWeight.normal,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              )),
+              const SizedBox(height: 2),
+              Text(valor, style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              )),
+            ],
+          ),
         ),
       ],
     );
