@@ -105,6 +105,7 @@ class _ClientesViewState extends State<ClientesView> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _HojaCliente(vm: _vm, cliente: cliente),
     );
@@ -638,6 +639,7 @@ class _HojaClienteState extends State<_HojaCliente> {
               Expanded(
                 child: ListView(
                   controller: controller,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     const SizedBox(height: 8),
                     _CampoFormulario(

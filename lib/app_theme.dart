@@ -306,7 +306,9 @@ class AppTheme {
           backgroundColor: cs.primary,
           foregroundColor: cs.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600,
+          ),
           minimumSize: const Size.fromHeight(46),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         ),
@@ -316,7 +318,9 @@ class AppTheme {
           foregroundColor: cs.primary,
           side: BorderSide(color: cs.primary),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600,
+          ),
           minimumSize: const Size.fromHeight(46),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         ),
@@ -324,7 +328,9 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: cs.primary,
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
@@ -353,20 +359,34 @@ class AppTheme {
           borderSide: BorderSide(color: cs.error, width: 2),
         ),
         labelStyle: TextStyle(
+          fontFamily: 'Poppins',
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: textoSecundario,
         ),
-        errorStyle: TextStyle(fontSize: 11, color: cs.error),
-        hintStyle: TextStyle(fontSize: 14, color: textoSecundario),
+        errorStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 11,
+          color: cs.error,
+        ),
+        hintStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          color: textoSecundario,
+        ),
       ),
 
       chipTheme: ChipThemeData(
         backgroundColor: surfaceContainer,
         selectedColor: cs.secondaryContainer,
         disabledColor: surfaceContainer.withValues(alpha: 0.5),
-        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+        labelStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
         secondaryLabelStyle: TextStyle(
+          fontFamily: 'Poppins',
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: cs.onSecondaryContainer,
@@ -382,6 +402,14 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           side: BorderSide(color: cs.outline),
           visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+        ).copyWith(
+          textStyle: const WidgetStatePropertyAll(
+            TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ),
 
@@ -406,12 +434,14 @@ class AppTheme {
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: textoPrincipal,
             );
           }
           return TextStyle(
+            fontFamily: 'Poppins',
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: textoSecundario,
@@ -446,7 +476,10 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: cs.inverseSurface,
-        contentTextStyle: TextStyle(color: cs.onInverseSurface),
+        contentTextStyle: TextStyle(
+          fontFamily: 'Poppins',
+          color: cs.onInverseSurface,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

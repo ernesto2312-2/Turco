@@ -17,11 +17,10 @@ class _ServiciosViewState extends State<ServiciosView> {
 
   @override
   Widget build(BuildContext context) {
-    final lista = _vm.serviciosFiltrados;
-
     return ListenableBuilder(
       listenable: _vm,
       builder: (context, _) {
+        final lista = _vm.serviciosFiltrados;
         return Scaffold(
           appBar: AppBar(
             title: Column(
@@ -185,60 +184,63 @@ class _TarjetaServicio extends StatelessWidget {
         onTap: () {
           context.push('/turno/nuevo', extra: servicio.id);
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 76,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(_iconoCategoria(servicio.categoria),
-                  size: 36, color: Theme.of(context).colorScheme.primary),
-            ),
-            const SizedBox(height: 10),
-            Text(servicio.nombre,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                )),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.access_time, size: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant),
-                const SizedBox(width: 3),
-                Expanded(
-                  child: Text('${servicio.duracionMinutos} min',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      )),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text('\$${servicio.precio.toInt()}', style: TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.primary,
-                )),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(8),
+                child: Icon(_iconoCategoria(servicio.categoria),
+                    size: 36, color: Theme.of(context).colorScheme.primary),
               ),
-              child: Text(servicio.publico.label, style: TextStyle(
-                fontSize: 11, fontWeight: FontWeight.w600,
-                color: _colorPublico(context, servicio.publico),
-              )),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Text(servicio.nombre,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 3),
+                  Expanded(
+                    child: Text('${servicio.duracionMinutos} min',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        )),
+                  ),
+                  Text('\$${servicio.precio.toInt()}', style: TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.primary,
+                  )),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(servicio.publico.label, style: TextStyle(
+                  fontSize: 11, fontWeight: FontWeight.w600,
+                  color: _colorPublico(context, servicio.publico),
+                )),
+              ),
+            ],
+          ),
         ),
       ),
     );

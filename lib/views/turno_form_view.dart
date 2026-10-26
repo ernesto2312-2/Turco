@@ -66,10 +66,10 @@ class _TurnoFormViewState extends State<TurnoFormView> {
           context: context,
           builder: (_) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-            title: const Text('¿Descartar los cambios?',
+            title: const Text('Â¿Descartar los cambios?',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             content: const Text(
-              'Tienes cambios sin guardar en este turno. Si sales ahora se perderán.',
+              'Tienes cambios sin guardar en este turno. Si sales ahora se perderÃ¡n.',
               style: TextStyle(fontSize: 14),
             ),
             actions: [
@@ -103,14 +103,12 @@ class _TurnoFormViewState extends State<TurnoFormView> {
               title: const Text('Nuevo turno'),
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+              bottom: false,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                           _CampoCliente(vm: _vm),
                           const SizedBox(height: 14),
                           _BotonCrearCliente(),
@@ -156,11 +154,11 @@ class _TurnoFormViewState extends State<TurnoFormView> {
                           _CampoNotas(vm: _vm),
                         ],
                       ),
-                    ),
-                  ),
-                  _BarraInferior(vm: _vm, cs: cs),
-                ],
               ),
+            ),
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: _BarraInferior(vm: _vm, cs: cs),
             ),
           );
         },
@@ -171,13 +169,7 @@ class _TurnoFormViewState extends State<TurnoFormView> {
   List<Widget> _categoriasServicios(TurnoFormViewModel vm) {
     final out = <Widget>[];
     for (final cat in vm.categorias) {
-      final lista = MockData.servicios
-          .where((s) => s.categoria == cat)
-          .where((s) {
-            if (vm.publicoFiltro == Publico.todos) return true;
-            return s.publico == vm.publicoFiltro;
-          }).toList()
-        ..sort((a, b) => a.nombre.compareTo(b.nombre));
+      final lista = vm.serviciosDeCategoria(cat);
       if (lista.isEmpty) continue;
       out.add(_CategoriaServicios(vm: vm, categoria: cat, servicios: lista));
     }
@@ -187,74 +179,83 @@ class _TurnoFormViewState extends State<TurnoFormView> {
 
 // ---------- Subwidgets ----------
 
+class _CampoSeleccion extends StatelessWidget {
+  final String label;
+  final IconData icono;
+  final String texto;
+  final bool vacio;
+  final String? errorTexto;
+  final VoidCallback onTap;
+
+  const _CampoSeleccion({
+    required this.label,
+    required this.icono,
+    required this.texto,
+    required this.vacio,
+    required this.errorTexto,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(
+          fontSize: 12, fontWeight: FontWeight.w500,
+          color: cs.onSurfaceVariant,
+        )),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              errorText: errorTexto,
+              errorMaxLines: 2,
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 14),
+            ),
+            child: Row(
+              children: [
+                Icon(icono, size: 18, color: cs.onSurfaceVariant),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    texto,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: vacio ? cs.onSurfaceVariant : cs.onSurface,
+                    ),
+                  ),
+                ),
+                Icon(Icons.arrow_drop_down, size: 20, color: cs.onSurfaceVariant),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _CampoCliente extends StatelessWidget {
   final TurnoFormViewModel vm;
   const _CampoCliente({required this.vm});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Cliente', style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        )),
-        const SizedBox(height: 6),
-        FormField<String>(
-          validator: (_) => vm.clienteId == null ? 'Selecciona un cliente' : null,
-          builder: (estado) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: () => _abrirSelectorCliente(context),
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      hintText: vm.clienteId == null
-                          ? 'Selecciona un cliente'
-                          : vm.nombreClienteMostrado,
-                      prefixIcon: const Icon(Icons.person, size: 18),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: estado.hasError
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: estado.hasError
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      errorText: estado.hasError ? estado.errorText : null,
-                      errorMaxLines: 2,
-                      filled: true,
-                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 14),
-                    ),
-                    child: const Icon(Icons.arrow_drop_down, size: 20),
-                  ),
-                ),
-                if (estado.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4, left: 4),
-                    child: Text(estado.errorText!,
-                        style: TextStyle(
-                          fontSize: 12, color: Theme.of(context).colorScheme.error,
-                        )),
-                  ),
-              ],
-            );
-          },
-        ),
-      ],
+    final vacio = vm.clienteId == null;
+    return _CampoSeleccion(
+      label: 'Cliente',
+      icono: Icons.person,
+      texto: vacio ? 'Elegir cliente' : vm.nombreClienteMostrado,
+      vacio: vacio,
+      errorTexto: vm.errorDe('cliente'),
+      onTap: () => _abrirSelectorCliente(context),
     );
   }
 
@@ -292,7 +293,7 @@ class _CampoCliente extends StatelessWidget {
                 fontSize: 14, fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurface,
               )),
-              subtitle: Text('${c.telefono} · ${c.genero.label}',
+              subtitle: Text('${c.telefono} Â· ${c.genero.label}',
                   style: TextStyle(
                     fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant,
                   )),
@@ -408,69 +409,18 @@ class _CampoEstilista extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Estilista', style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        )),
-        const SizedBox(height: 6),
-        FormField<String>(
-          validator: (_) => vm.estilistaId == null
-              ? 'Selecciona un estilista' : null,
-          builder: (estado) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: () => _abrirSelectorEstilista(context),
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      hintText: vm.estilistaId == null
-                          ? 'Primero elige los servicios'
-                          : vm.nombreEstilistaSeleccionado,
-                      prefixIcon: const Icon(Icons.person, size: 18),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: estado.hasError
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.outline,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: estado.hasError
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      errorText: estado.hasError ? estado.errorText : null,
-                      errorMaxLines: 2,
-                      filled: true,
-                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 14),
-                    ),
-                    child: const Icon(Icons.arrow_drop_down, size: 20),
-                  ),
-                ),
-                if (estado.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4, left: 4),
-                    child: Text(estado.errorText!,
-                        style: TextStyle(
-                          fontSize: 12, color: Theme.of(context).colorScheme.error,
-                        )),
-                  ),
-              ],
-            );
-          },
-        ),
-      ],
+    final vacio = vm.estilistaId == null;
+    return _CampoSeleccion(
+      label: 'Estilista',
+      icono: Icons.content_cut,
+      texto: vacio
+          ? (vm.serviciosSeleccionados
+              ? 'Elegir estilista'
+              : 'Primero elige los servicios')
+          : (vm.nombreEstilistaSeleccionado ?? 'Elegir estilista'),
+      vacio: vacio,
+      errorTexto: vm.errorDe('estilista'),
+      onTap: () => _abrirSelectorEstilista(context),
     );
   }
 
@@ -541,56 +491,16 @@ class _CampoFecha extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Fecha', style: TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        )),
-        const SizedBox(height: 6),
-        FormField<DateTime>(
-          validator: (_) => vm.fecha == null
-              ? 'Elige una fecha válida (no domingos)' : null,
-          builder: (estado) {
-            return InkWell(
-              onTap: () => _elegirFecha(context),
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  hintText: vm.fecha == null
-                      ? 'Selecciona una fecha'
-                      : '${vm.fecha!.day}/${vm.fecha!.month}/${vm.fecha!.year}',
-                  prefixIcon: const Icon(Icons.calendar_today, size: 18),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: estado.hasError
-                          ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: estado.hasError
-                          ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  errorText: estado.hasError ? estado.errorText : null,
-                  errorMaxLines: 2,
-                  filled: true,
-                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 14),
-                ),
-                child: const Icon(Icons.arrow_drop_down, size: 20),
-              ),
-            );
-          },
-        ),
-      ],
+    final vacia = vm.fecha == null;
+    return _CampoSeleccion(
+      label: 'Fecha',
+      icono: Icons.calendar_today,
+      texto: vacia
+          ? 'Elegir fecha'
+          : '${vm.fecha!.day}/${vm.fecha!.month}/${vm.fecha!.year}',
+      vacio: vacia,
+      errorTexto: vm.errorDe('fecha'),
+      onTap: () => _elegirFecha(context),
     );
   }
 }
@@ -735,7 +645,7 @@ class _CampoNotas extends StatelessWidget {
         const SizedBox(height: 6),
         FormField<String>(
           validator: (_) {
-            if (vm.notas.length > 500) return 'Máximo 500 caracteres';
+            if (vm.notas.length > 500) return 'MÃ¡ximo 500 caracteres';
             return null;
           },
           builder: (estado) {
@@ -803,7 +713,8 @@ class _BarraInferior extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ini = vm.fechaHoraInicio;
+    final fin = vm.horaFin;
+    String dos(int v) => v.toString().padLeft(2, '0');
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -823,8 +734,8 @@ class _BarraInferior extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: _ItemResumen(
-                      icono: Icons.access_time,
-                      texto: '${vm.duracionMinutos} min',
+                      icono: Icons.timer_outlined,
+                      texto: vm.duracionTexto,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -833,10 +744,10 @@ class _BarraInferior extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.center,
                     child: _ItemResumen(
-                      icono: Icons.flag,
-                      texto: ini == null
+                      icono: Icons.outlined_flag,
+                      texto: fin == null
                           ? 'Fin --:--'
-                          : 'Fin ${ini.hour.toString().padLeft(2,'0')}:${ini.minute.toString().padLeft(2,'0')}',
+                          : 'Fin ${dos(fin.hour)}:${dos(fin.minute)}',
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -845,8 +756,8 @@ class _BarraInferior extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: _ItemResumen(
-                      icono: Icons.attach_money,
-                      texto: '\$${vm.precioTotal.toInt()}',
+                      icono: Icons.payments_outlined,
+                      texto: '\$ ${vm.precioTotal.toInt()}',
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       peso: FontWeight.w700,
                     ),
@@ -880,6 +791,12 @@ class _BarraInferior extends StatelessWidget {
                       final r = vm.guardar();
                       if (r == TurnoFormResultado.exito) {
                         Navigator.pop(context, true);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Revisa los campos marcados'),
+                          ),
+                        );
                       }
                     },
                     style: FilledButton.styleFrom(
@@ -940,3 +857,4 @@ class _ItemResumen extends StatelessWidget {
     );
   }
 }
+

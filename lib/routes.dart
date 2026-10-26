@@ -7,80 +7,87 @@ import 'package:turco/views/estilistas_view.dart';
 import 'package:turco/views/turno_detail_view.dart';
 import 'package:turco/views/turno_form_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-
 /// Configuración de navegación con go_router.
 /// - StatefulShellRoute.indexedStack: 4 pestañas (Agenda, Clientes, Servicios, Estilistas)
 ///   que conservan su estado al cambiar de destino.
 /// - Rutas de turno (nuevo / detalle / editar) se abren por encima de la barra inferior
 ///   usando parentNavigatorKey.
-final GoRouter appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
-  initialLocation: '/agenda',
-  routes: [
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return ShellView(navigationShell: navigationShell);
-      },
-      branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/agenda',
-              builder: (context, state) => const AgendaView(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/clientes',
-              builder: (context, state) => const ClientesView(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/servicios',
-              builder: (context, state) => const ServiciosView(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/estilistas',
-              builder: (context, state) => const EstilistasView(),
-            ),
-          ],
-        ),
-      ],
-    ),
-    // Rutas que se abren por encima de la barra inferior (sobre el shell)
-    GoRoute(
-      path: '/turno/nuevo',
-      builder: (context, state) => TurnoFormView(extra: state.extra),
-      parentNavigatorKey: _rootNavigatorKey,
-    ),
-    GoRoute(
-      path: '/turno/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return TurnoDetailView(turnoId: id);
-      },
-      parentNavigatorKey: _rootNavigatorKey,
-    ),
-    GoRoute(
-      path: '/turno/:id/editar',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return TurnoFormView.esEdicion(turnoId: id);
-      },
-      parentNavigatorKey: _rootNavigatorKey,
-    ),
-  ],
-);
+///
+/// Se expone como función para poder crear una instancia limpia en pruebas
+/// (por ejemplo, al generar capturas de cada pantalla).
+GoRouter crearRouter({String initialLocation = '/agenda'}) {
+  final rootNavigatorKey = GlobalKey<NavigatorState>();
+  return GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: initialLocation,
+    routes: [
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ShellView(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/agenda',
+                builder: (context, state) => const AgendaView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/clientes',
+                builder: (context, state) => const ClientesView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/servicios',
+                builder: (context, state) => const ServiciosView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/estilistas',
+                builder: (context, state) => const EstilistasView(),
+              ),
+            ],
+          ),
+        ],
+      ),
+      // Rutas que se abren por encima de la barra inferior (sobre el shell)
+      GoRoute(
+        path: '/turno/nuevo',
+        builder: (context, state) => TurnoFormView(extra: state.extra),
+        parentNavigatorKey: rootNavigatorKey,
+      ),
+      GoRoute(
+        path: '/turno/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return TurnoDetailView(turnoId: id);
+        },
+        parentNavigatorKey: rootNavigatorKey,
+      ),
+      GoRoute(
+        path: '/turno/:id/editar',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return TurnoFormView.esEdicion(turnoId: id);
+        },
+        parentNavigatorKey: rootNavigatorKey,
+      ),
+    ],
+  );
+}
+
+/// Router que usa la aplicación.
+final GoRouter appRouter = crearRouter();
 
 class ShellView extends StatelessWidget {
   final StatefulNavigationShell navigationShell;

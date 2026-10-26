@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:turco/app_state.dart';
 import 'package:turco/app_theme.dart';
 import 'package:turco/data/mock_data.dart';
@@ -10,7 +11,11 @@ void main() {
 }
 
 class TurcoApp extends StatelessWidget {
-  const TurcoApp({super.key});
+  const TurcoApp({super.key, this.routerConfig});
+
+  /// Permite inyectar un router propio (pruebas y capturas). Por defecto usa
+  /// el router de la aplicación.
+  final GoRouter? routerConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,7 @@ class TurcoApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: tema,
           darkTheme: AppTheme.temaOscuro(),
-          routerConfig: appRouter,
+          routerConfig: routerConfig ?? appRouter,
         );
       },
     );

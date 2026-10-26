@@ -18,8 +18,8 @@ class CatalogoViewModel extends ChangeNotifier {
     return MockData.servicios.where((s) {
       final coincideCat = _filtroCategoria == 'Todas' ||
           s.categoria == _filtroCategoria;
-      final coincidePub = _filtroPublico == Publico.todos ||
-          s.publico == _filtroPublico;
+      final coincidePub =
+          _filtroPublico == Publico.todos || s.disponiblePara(_filtroPublico);
       return coincideCat && coincidePub;
     }).toList()
       ..sort((a, b) => a.nombre.compareTo(b.nombre));

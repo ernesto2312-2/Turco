@@ -158,6 +158,7 @@ class _AgendaViewState extends State<AgendaView> {
                   child: turnos.isEmpty
                       ? _EstadoVacio()
                       : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 88),
                           itemCount: turnos.length,
                           itemBuilder: (context, i) {
                             final d = turnos[i];

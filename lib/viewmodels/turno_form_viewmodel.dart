@@ -56,14 +56,19 @@ class TurnoFormViewModel extends ChangeNotifier {
   List<String> get categorias {
     final set = <String>{};
     for (final s in MockData.servicios) {
-      set.add(s.categoria);
+      if (_publicoFiltro == Publico.todos || s.disponiblePara(_publicoFiltro)) {
+        set.add(s.categoria);
+      }
     }
     return set.toList()..sort();
   }
 
-  List<Servicio> serviciosDeCategoria(String categoria) =>
-      MockData.servicios.where((s) => s.categoria == categoria).toList()
-        ..sort((a, b) => a.nombre.compareTo(b.nombre));
+  List<Servicio> serviciosDeCategoria(String categoria) => MockData.servicios
+      .where((s) =>
+          s.categoria == categoria &&
+          (_publicoFiltro == Publico.todos || s.disponiblePara(_publicoFiltro)))
+      .toList()
+    ..sort((a, b) => a.nombre.compareTo(b.nombre));
 
   // ----- Resumen siempre visible -----
   int get duracionMinutos {
@@ -74,6 +79,15 @@ class TurnoFormViewModel extends ChangeNotifier {
           .duracionMinutos;
     }
     return total;
+  }
+
+  /// Duración lista para mostrar: "45 min", "1 h" o "1 h 30 min".
+  String get duracionTexto {
+    final m = duracionMinutos;
+    if (m < 60) return '$m min';
+    final h = m ~/ 60;
+    final resto = m % 60;
+    return resto == 0 ? '$h h' : '$h h $resto min';
   }
 
   DateTime? get fechaHoraInicio {
@@ -125,8 +139,7 @@ class TurnoFormViewModel extends ChangeNotifier {
     _clienteId = id;
     _nombreClienteMostrado = nombre;
     _publicoFiltro = _publicoDeGenero(genero);
-    // si el estilista actual deja de ser válido (por filtro público no aplica aquí,
-    // el estilista se valida por servicios), mantener
+    _depurarServiciosFueraDeFiltro();
     _marcarCambiado(true);
     notifyListeners();
   }
@@ -137,9 +150,30 @@ class TurnoFormViewModel extends ChangeNotifier {
   };
 
   void cambiarPublicoFiltro(Publico p) {
+    if (_publicoFiltro == p) return;
     _publicoFiltro = p;
-    _marcarCambiado(true);
+    _depurarServiciosFueraDeFiltro();
     notifyListeners();
+  }
+
+  /// Quita los servicios elegidos que no aplican al filtro de público actual
+  /// (los servicios "para todos" siempre se mantienen).
+  void _depurarServiciosFueraDeFiltro() {
+    final fuera = _servicioIds.where((id) {
+      final s = MockData.servicios.where((x) => x.id == id).firstOrNull;
+      return s == null || !s.disponiblePara(_publicoFiltro);
+    }).toList();
+    if (fuera.isEmpty) return;
+
+    _servicioIds.removeAll(fuera);
+    final estilistaSigueValido = MockData.estilistas.any(
+      (e) => e.id == _estilistaId && e.realizaTodosLosServicios(_servicioIds.toList()),
+    );
+    if (_estilistaId != null && !estilistaSigueValido) {
+      _estilistaId = null;
+    }
+    _marcarCambiado(true);
+    _recalcularErrores();
   }
 
   // ----- Servicios -----

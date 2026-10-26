@@ -75,6 +75,9 @@ class Servicio {
     required this.precio,
     required this.publico,
   });
+
+  /// Un servicio "para todos" está disponible para cualquier público.
+  bool disponiblePara(Publico p) => publico == p || publico == Publico.todos;
 }
 
 enum Publico { todos, mujeres, hombres }
